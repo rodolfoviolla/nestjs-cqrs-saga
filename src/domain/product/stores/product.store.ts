@@ -44,7 +44,11 @@ export class ProductStore {
     sku: string,
   ): Promise<Product | Error> {
     try {
-      await this.productRepository.update({ sku }, productEntity);
+      const product = Object.keys(productEntity).reduce(
+        (product: Partial<Product>, key) => 
+        productEntity[key] ? ({ ...product, [key]: productEntity[key] }) : product
+      , {})
+      await this.productRepository.update({ sku }, product);
       return this.productRepository.findOne({ sku });
     } catch (e) {
       return new Error(e);
@@ -53,9 +57,8 @@ export class ProductStore {
 
   public async removeProduct(sku: string): Promise<Product | Error> {
     try {
-      const product = this.productRepository.findOne({ sku });
+      const product = await this.productRepository.findOne({ sku });
       await this.productRepository.delete({ sku });
-
       return product;
     } catch (e) {
       return new Error(e);

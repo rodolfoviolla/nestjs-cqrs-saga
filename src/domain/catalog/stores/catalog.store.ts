@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
 import { Catalog } from '../entities/catalog.entity';
@@ -35,7 +35,7 @@ export class CatalogStore {
       const catalog = this.catalogRepository.create(catalogEntity);
       return await this.catalogRepository.save(catalog);
     } catch (e) {
-      return new Error(e);
+      Logger.error(e);
     }
   }
 
@@ -44,10 +44,14 @@ export class CatalogStore {
     sku: string,
   ): Promise<Catalog | Error> {
     try {
-      await this.catalogRepository.update({ sku }, catalogEntity);
+      const catalog = Object.keys(catalogEntity).reduce(
+        (catalog: Partial<Catalog>, key) => 
+        catalogEntity[key] ? ({ ...catalog, [key]: catalogEntity[key] }) : catalog
+      , {})
+      await this.catalogRepository.update({ sku }, catalog);
       return this.catalogRepository.findOne({ sku });
     } catch (e) {
-      return new Error(e);
+      Logger.error(e);
     }
   }
 
@@ -55,10 +59,9 @@ export class CatalogStore {
     try {
       const catalog = this.catalogRepository.findOne({ sku });
       await this.catalogRepository.delete({ sku });
-
       return catalog;
     } catch (e) {
-      return new Error(e);
+      Logger.error(e);
     }
   }
 }

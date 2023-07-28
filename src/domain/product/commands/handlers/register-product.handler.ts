@@ -22,12 +22,12 @@ export class RegisterProductHandler implements ICommandHandler<RegisterProductCo
       productEntity.price = price;
       productEntity.currency = currency;
       const product = await this.productStore.register(productEntity);
+
       if (product instanceof Error) {
         throw product;
       }
-      const productAggregate = this.publisher.mergeObjectContext(
-        await new ProductAggregate(sku),
-      );
+
+      const productAggregate = this.publisher.mergeObjectContext(new ProductAggregate());
       productAggregate.registerProduct(sku, name, price, currency);
       productAggregate.commit();
 

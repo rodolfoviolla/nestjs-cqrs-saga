@@ -9,7 +9,7 @@ import { ProductStore } from './stores/product.store';
 import { DatabaseModule } from '../../databases/database.module';
 import { ProductProvider } from './providers/product.provider';
 import { ProductSaga } from './sagas/product.saga';
-import { ProductWasAddedHandlerEvent } from './events/handlers/product-was-added.handler.event';
+import { EventHandlers } from './events/handlers';
 
 @Module({
   controllers: [ProductController],
@@ -24,7 +24,7 @@ import { ProductWasAddedHandlerEvent } from './events/handlers/product-was-added
     ProductStore,
     ...QueriesHandlers,
     ProductSaga,
-    ProductWasAddedHandlerEvent,
+    ...EventHandlers,
   ],
 })
 export class ProductModule {}
